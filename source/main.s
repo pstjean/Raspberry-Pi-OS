@@ -21,7 +21,8 @@ lsl r1,#18
 str r1,[r0,#4]
 
 ;@@@@ now, we actually switch pin 16 off to turn on the LED
-
+;@ label the next line so that we can branch to the beginning
+onoff$:
 ;@ again, "move" 1 base 10 in register 1
 mov r1,#1
 ;@ = 1 0000 0000 0000 0000 base 2 or 65536 base 10 
@@ -29,11 +30,36 @@ lsl r1,#16
 ;@ address 40 to turn a pin off (28 would turn it on)
 str r1,[r0,#40]
 
-;@@@@ now we give the processor a task to do so it doesn't crash
+;@@@@ wasting time to wait: we add a big number to register 2 and
+;@ then we subtract 1, see if we've made it to 0 yet, and if not,
+;@ we do it again
 
-;@ label the next line "loop$" the dollar sign is a convention
-loop$:
-;@ "branch" causes the line at the specified label to be
-;@ executed
-b loop$
+mov r2,#0x3F0000
+;@ label
+wait1$:
+;@ subtract the second argument from the first
+sub r2,#1
+;@ compare the first argument with the second, stores the result
+;@ of the comparison in the "current processor status" register
+cmp r2,#0
+;@ ne (not equal) suffix on the b (branch) command means "branch if
+;@ the last comparison's result was that the values were not equal"
+bne wait1$
 
+;@@@@ now we turn off the LED
+;@ again, "move" 1 base 10 in register 1
+mov r1,#1
+;@ = 1 0000 0000 0000 0000 base 2 or 65536 base 10 
+lsl r1,#16
+;@ address 28 to turn a pin on (and turn the LED off)
+str r1,[r0,#28]
+
+;@ here is our wait code again
+mov r2,#0x3F0000
+wait2$:
+sub r2,#1
+cmp r2,#0
+bne wait2$
+
+;@@@@ finally, we branch back to the code that turns on the LED
+b onoff$

@@ -5,14 +5,29 @@ build/output.elf:     file format elf32-littlearm
 Disassembly of section .init:
 
 00000000 <_start>:
-   0:	e59f0018 	ldr	r0, [pc, #24]	; 20 <loop$+0x4>
+   0:	e59f0044 	ldr	r0, [pc, #68]	; 4c <wait2$+0x10>
    4:	e3a01001 	mov	r1, #1
    8:	e1a01901 	lsl	r1, r1, #18
    c:	e5801004 	str	r1, [r0, #4]
+
+00000010 <onoff$>:
   10:	e3a01001 	mov	r1, #1
   14:	e1a01801 	lsl	r1, r1, #16
   18:	e5801028 	str	r1, [r0, #40]	; 0x28
+  1c:	e3a0283f 	mov	r2, #4128768	; 0x3f0000
 
-0000001c <loop$>:
-  1c:	eafffffe 	b	1c <loop$>
-  20:	20200000 	.word	0x20200000
+00000020 <wait1$>:
+  20:	e2422001 	sub	r2, r2, #1
+  24:	e3520000 	cmp	r2, #0
+  28:	1afffffc 	bne	20 <wait1$>
+  2c:	e3a01001 	mov	r1, #1
+  30:	e1a01801 	lsl	r1, r1, #16
+  34:	e580101c 	str	r1, [r0, #28]
+  38:	e3a0283f 	mov	r2, #4128768	; 0x3f0000
+
+0000003c <wait2$>:
+  3c:	e2422001 	sub	r2, r2, #1
+  40:	e3520000 	cmp	r2, #0
+  44:	1afffffc 	bne	3c <wait2$>
+  48:	eafffff0 	b	10 <onoff$>
+  4c:	20200000 	.word	0x20200000
